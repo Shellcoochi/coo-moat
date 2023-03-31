@@ -1,17 +1,13 @@
-import { createRequire } from 'module'
 import { Command } from 'commander'
-import exec from '../exec/index.js'
+import fs from 'fs-extra'
+import { init } from '../actions/index.js'
 import log from '../../tools/log/index.js'
 
-const require = createRequire(import.meta.url)
-const pkg = require('../../package.json')
+const pkg = fs.readJsonSync('package.json', { throws: false })
 
 const program = new Command()
 
-/**
- * 主函数
- */
-function core () {
+function main() {
   try {
     // 脚手架执行的准备阶段
     prepare()
@@ -22,7 +18,7 @@ function core () {
   }
 }
 
-function registerCommand () {
+function registerCommand() {
   program
     .name(Object.keys(pkg.bin)[0])
     .usage('<command> [options]')
@@ -30,7 +26,7 @@ function registerCommand () {
 
   program
     .command('init [projectName]')
-    .action(exec)
+    .action(init)
 
   program.parse(process.argv)
 }
@@ -41,14 +37,14 @@ function registerCommand () {
  *  --root降权
  *  --检查用户主目录是否存在
  */
-function prepare () {
+function prepare() {
   checkPkgVersion()
 }
 
 /**
  * 脚手架版本检查
  */
-function checkPkgVersion () {
+function checkPkgVersion() {
   // 1.获取当前版本号和模块名
   const currentVersion = pkg.version
   const npmName = pkg.name
@@ -58,4 +54,4 @@ function checkPkgVersion () {
   // 4.获取最新版本号，提醒用户更新到最新版本
 }
 
-export default core
+export default main

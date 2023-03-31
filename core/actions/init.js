@@ -24,11 +24,11 @@ const IGNORE_TEMPLATE = `
 
 function exec() {
     try {
-        //   const cmdObj = arguments[arguments.length - 1]
-        //   console.log(cmdObj.name())
         // eslint初始化
-        // initEslint()
+        initEslint()
+        // 更新[.vscode]中的配置文件
         updateVscodeConfig()
+        // 更新[.gitionore]
         updateIgnoreFile()
     } catch (e) {
         log.error(e)

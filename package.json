@@ -4,11 +4,15 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "coo": "core/bin/index.js"
+    "coo": "dist/coo-moat.js"
   },
+  "files": [
+    "dist/*"
+   ],
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build":"node esbuild.config.js"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +23,8 @@
     "fs-extra": "^11.1.1",
     "import-local": "^3.1.0",
     "npmlog": "^7.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.14"
   }
 }

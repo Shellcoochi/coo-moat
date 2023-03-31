@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 
-import importLocal from 'import-local';
-import npmlog from 'npmlog';
 import core from '../lib/index.js'
+import log from '../../tools/log/index.js'
 
-if (importLocal(import.meta.url)) {
-	console.log('Using local version of this package');
-    npmlog.info('cli','正在使用 coo 本地版本');
-} else {
-	core();
-}
+log.info(' ==================')
+log.info('    欢迎使用 MOAT   ')
+log.info(' ==================')
+
+core();
