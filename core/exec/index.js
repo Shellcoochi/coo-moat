@@ -16,12 +16,24 @@ const SETTINGS_TEMPLATE = {
     }
 }
 
+const IGNORE_TEMPLATE = `
+# coo-moat
+!.vscode/settings.json
+!.vscode/extensions.json
+    `
+
 function exec() {
-    //   const cmdObj = arguments[arguments.length - 1]
-    //   console.log(cmdObj.name())
-    // eslint初始化
-    // initEslint()
-    updateVscodeConfig()
+    try {
+        //   const cmdObj = arguments[arguments.length - 1]
+        //   console.log(cmdObj.name())
+        // eslint初始化
+        // initEslint()
+        updateVscodeConfig()
+        updateIgnoreFile()
+    } catch (e) {
+        log.error(e)
+    }
+
 }
 
 /**
@@ -33,11 +45,11 @@ function initEslint() {
         log.info(data)
     })
     installEslint.stderr.on('data', function (data) {
-        log.error(data)
+        throw (data)
     })
     installEslint.on('close', function (code) {
         if (code !== 0) {
-            log.error('ESLint依赖安装出错: ' + code)
+            throw ('ESLint依赖安装出错: ' + code)
         } else {
             log.success('ESLint依赖安装成功')
             initEslintConfig()
@@ -55,6 +67,17 @@ function initEslintConfig() {
 }
 
 /**
+ * 更新[.gitionore]
+ *  --使[.vscode]中的extensions.json、settings.json可提交至仓库
+ */
+function updateIgnoreFile() {
+    fs.outputFile('.gitignore', IGNORE_TEMPLATE, { flag: 'a' }, err => {
+        if (err) throw err
+        log.success(`.gitignore已修改`)
+    })
+}
+
+/**
  * 更新[.vscode]中的配置文件
  *  --extensions.json
  *  --settings.json
@@ -63,9 +86,9 @@ function updateVscodeConfig() {
     const extensionsFilePath = '.vscode/extensions.json'
     const settingsFilePath = '.vscode/settings.json'
     // 修改[.vscode] extensions.json
-    rewriteJson(extensionsFilePath,EXTENSIONS_TEMPLATE)
+    rewriteJson(extensionsFilePath, EXTENSIONS_TEMPLATE)
     // 修改[.vscode] settings.json
-    rewriteJson(settingsFilePath,SETTINGS_TEMPLATE)
+    rewriteJson(settingsFilePath, SETTINGS_TEMPLATE)
     //修改ignore文件
 }
 
