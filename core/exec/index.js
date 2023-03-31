@@ -3,12 +3,12 @@ import { exec as spawn, execAsync } from '../../tools/utils/index.js'
 import log from '../../tools/log/index.js'
 
 const PREFIX = 'pnpm'
-const PLUGIN = [
-    "dbaeumer.vscode-eslint",
-]
+
 const EXTENSIONS_TEMPLATE =
 {
-    "recommendations": PLUGIN
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+    ]
 }
 const SETTINGS_TEMPLATE = {
     "editor.codeActionsOnSave": {
@@ -62,81 +62,35 @@ function initEslintConfig() {
 function updateVscodeConfig() {
     const extensionsFilePath = '.vscode/extensions.json'
     const settingsFilePath = '.vscode/settings.json'
-    updateExtensions();
-    updateSettings();
-    // // 确保目标JSON文件存在，若不存在则创建
-    // fs.ensureFile(extensionsFilePath).then(() => {
-    //     // 获取原有的目标JSON文件内容
-    //     let extensions = fs.readJsonSync(extensionsFilePath, { throws: false })
-    //     // 若内容不为空则向原有内容中追加
-    //     if (extensions) {
-    //         extensions.recommendations = [...extensions.recommendations, ...PLUGIN]
-    //     } else {
-    //         // 若内容为空则直接写入新内容
-    //         extensions = EXTENSIONS_TEMPLATE
-    //     }
-    //     fs.writeJson(extensionsFilePath, extensions, { spaces: '\t' }, err => {
-    //         if (err) return console.error(err)
-    //         console.log('success!')
-    //     })
-    // }).catch(err => {
-    //     throw(err)
-    // })
-    //  //修改ignore文件
+    // 修改[.vscode] extensions.json
+    rewriteJson(extensionsFilePath,EXTENSIONS_TEMPLATE)
+    // 修改[.vscode] settings.json
+    rewriteJson(settingsFilePath,SETTINGS_TEMPLATE)
+    //修改ignore文件
 }
 
-
 /**
- * 修改[.vscode] settings.json
+ * 重写json文件
  */
-function updateSettings() {
-    const settingsFilePath = '.vscode/settings.json'
+function rewriteJson(path, template, styles = { spaces: '\t' }) {
     // 确保目标JSON文件存在，若不存在则创建
-    fs.ensureFile(settingsFilePath).then(() => {
+    fs.ensureFile(path).then(() => {
         // 获取原有的目标JSON文件内容
-        let settings = fs.readJsonSync(settingsFilePath, { throws: false })
+        let fileJson = fs.readJsonSync(path, { throws: false })
         // 若内容不为空则向原有内容中追加
-        if (settings) {
-            settings["editor.codeActionsOnSave"] = {
-                "source.fixAll.eslint": true
-            }
+        if (fileJson) {
+            fileJson = { ...fileJson, ...template }
         } else {
             // 若内容为空则直接写入新内容
-            settings = SETTINGS_TEMPLATE
+            fileJson = template
         }
-        fs.writeJson(settingsFilePath, settings, { spaces: '\t' }, err => {
-            if (err) return log.error(err)
-            log.success(`${settingsFilePath}已修改`)
+        fs.writeJson(path, fileJson, styles, err => {
+            if (err) throw err
+            log.success(`${path}已修改`)
         })
     }).catch(err => {
         throw (err)
     })
 }
-
-/**
- * 修改[.vscode] extensions.json
- */
-function updateExtensions() {
-    const extensionsFilePath = '.vscode/extensions.json'
-    // 确保目标JSON文件存在，若不存在则创建
-    fs.ensureFile(extensionsFilePath).then(() => {
-        // 获取原有的目标JSON文件内容
-        let extensions = fs.readJsonSync(extensionsFilePath, { throws: false })
-        // 若内容不为空则向原有内容中追加
-        if (extensions) {
-            extensions.recommendations = [...extensions.recommendations, ...PLUGIN]
-        } else {
-            // 若内容为空则直接写入新内容
-            extensions = EXTENSIONS_TEMPLATE
-        }
-        fs.writeJson(extensionsFilePath, extensions, { spaces: '\t' }, err => {
-            if (err) return log.error(err)
-            log.success(`${extensionsFilePath}已修改`)
-        })
-    }).catch(err => {
-        throw (err)
-    })
-}
-
 
 export default exec
