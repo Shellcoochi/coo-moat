@@ -26,6 +26,7 @@ function exec() {
     try {
         // eslint初始化
         initEslint()
+        return false
         // 更新[.vscode]中的配置文件
         updateVscodeConfig()
         // 更新[.gitionore]
@@ -40,7 +41,7 @@ function exec() {
  * 初始化eslint
  */
 function initEslint() {
-    const installEslint = spawn(PREFIX, ['i eslint -D'])
+    const installEslint = spawn(PREFIX, ['install', 'eslint','-D'])
     installEslint.stdout.on('data', function (data) {
         log.info(data)
     })
