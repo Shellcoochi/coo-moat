@@ -25,7 +25,11 @@ const IGNORE_TEMPLATE = `
 function exec() {
     try {
         // eslint初始化
-        initEslint()
+        installPkg('eslint', initEslintConfig, ['-D'])
+        // 初始化commitlint
+        installPkg('@commitlint/{config-conventional,cli}', initCommitintConfig, ['-D'])
+        //初始化husky
+        installPkg('husky', initHuskyConfig, ['-D',])
         return false
         // 更新[.vscode]中的配置文件
         updateVscodeConfig()
@@ -34,27 +38,48 @@ function exec() {
     } catch (e) {
         log.error(e)
     }
+}
 
+function installPkg(pkgName, callBack, args = []) {
+    const installer = spawn(PREFIX, ['install', pkgName, ...args])
+    installer.stdout.on('data', function (data) {
+        log.info(data)
+    })
+    installer.stderr.on('data', function (data) {
+        log.info(data)
+    })
+    installer.on('close', function (code) {
+        if (code !== 0) {
+            throw (`${pkgName} 安装出错: ${code}`)
+        } else {
+            log.success(`${pkgName} 安装成功`)
+            callBack?.()
+        }
+    })
 }
 
 /**
- * 初始化eslint
+ * 初始化husky配置文件
  */
-function initEslint() {
-    const installEslint = spawn(PREFIX, ['install', 'eslint','-D'])
-    installEslint.stdout.on('data', function (data) {
-        log.info(data)
+function initHuskyConfig() {
+    // 生成.husky目录命令
+    const dirCmd = 'husky install'
+    // 添加pre-commit钩子命令
+    const preCommitCmd = "add .husky/pre-commit 'npx run lint-staged'"
+    //添加commit-msg钩子命令
+    const commitMsgCmd = "add .husky/commit-msg 'npx --no-install commitlint --edit $1'"
+    spawn('npx', [dirCmd, preCommitCmd, commitMsgCmd], {
+        stdio: 'inherit'
     })
-    installEslint.stderr.on('data', function (data) {
-        log.info(data)
-    })
-    installEslint.on('close', function (code) {
-        if (code !== 0) {
-            throw ('ESLint依赖安装出错: ' + code)
-        } else {
-            log.success('ESLint依赖安装成功')
-            initEslintConfig()
-        }
+}
+
+/**
+ * 初始化commitlint配置文件
+ */
+function initCommitintConfig() {
+    spawn('echo',
+        ["module.exports = {extends: ['@commitlint/config-conventional']}", '>', 'commitlint.config.js'], {
+        stdio: 'inherit'
     })
 }
 
@@ -62,7 +87,7 @@ function initEslint() {
  * 初始化eslint配置文件
  */
 function initEslintConfig() {
-    const createEslintConfig = spawn(PREFIX, ['eslint', '--init'], {
+    spawn(PREFIX, ['eslint', '--init'], {
         stdio: 'inherit'
     })
 }
