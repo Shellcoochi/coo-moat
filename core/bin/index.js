@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import core from '../lib/index.js'
-import log from '../../tools/log/index.js'
+const core = require('../lib')
+const log = require('../../tools/log')
 
 log.info(' ==================')
 log.info('    欢迎使用 MOAT   ')

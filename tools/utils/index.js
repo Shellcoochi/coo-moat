@@ -1,7 +1,7 @@
-import childProcess from 'child_process'
-import cliSpinner from 'cli-spinner'
+const childProcess = require('child_process')
+const cliSpinner = require('cli-spinner')
 
-function exec (command, args, options) {
+function exec(command, args, options) {
   const win32 = process.platform === 'win32'
 
   const cmd = win32 ? 'cmd' : command
@@ -9,7 +9,7 @@ function exec (command, args, options) {
   return childProcess.spawn(cmd, cmdArs, options || {})
 }
 
-function execAsync (command, args, options) {
+function execAsync(command, args, options) {
   return new Promise((resolve, reject) => {
     const p = exec(command, args, options)
     p.on('error', e => {
@@ -21,11 +21,11 @@ function execAsync (command, args, options) {
   })
 }
 
-function isObject (o) {
+function isObject(o) {
   return Object.prototype.toString.call(o) === '[object Object]'
 }
 
-function spinnerStart (msg, setSpinnerString = '|/-\\') {
+function spinnerStart(msg, setSpinnerString = '|/-\\') {
   const Spinner = cliSpinner.Spinner
 
   const spinner = new Spinner(msg + ' %s')
@@ -34,8 +34,8 @@ function spinnerStart (msg, setSpinnerString = '|/-\\') {
   return spinner
 }
 
-function sleep (timeout = 1000) {
+function sleep(timeout = 1000) {
   return new Promise(resolve => setTimeout(resolve, timeout))
 }
 
-export { isObject, spinnerStart, sleep, exec, execAsync }
+module.exports = { isObject, spinnerStart, sleep, exec, execAsync }

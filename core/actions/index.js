@@ -1,3 +1,3 @@
-import init from './init.js'
+const init =require('./init.js')
 
-export { init }
+module.exports = { init }

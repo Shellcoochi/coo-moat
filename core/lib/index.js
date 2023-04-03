@@ -1,7 +1,7 @@
-import { Command } from 'commander'
-import fs from 'fs-extra'
-import { init } from '../actions/index.js'
-import log from '../../tools/log/index.js'
+const  { Command }  = require('commander')
+const  fs  = require('fs-extra')
+const  { init }  = require('../actions')
+const  log  = require('../../tools/log')
 
 const pkg = fs.readJsonSync('package.json', { throws: false })
 
@@ -54,4 +54,4 @@ function checkPkgVersion() {
   // 4.获取最新版本号，提醒用户更新到最新版本
 }
 
-export default main
+module.exports = main

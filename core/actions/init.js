@@ -1,6 +1,6 @@
-import fs from 'fs-extra'
-import { exec as spawn, execAsync } from '../../tools/utils/index.js'
-import log from '../../tools/log/index.js'
+const fs = require('fs-extra')
+const { exec: spawn, execAsync } = require('../../tools/utils')
+const log = require('../../tools/log')
 
 const PREFIX = 'pnpm'
 
@@ -45,7 +45,7 @@ function initEslint() {
         log.info(data)
     })
     installEslint.stderr.on('data', function (data) {
-        throw (data)
+        log.info(data)
     })
     installEslint.on('close', function (code) {
         if (code !== 0) {
@@ -116,4 +116,4 @@ function rewriteJson(path, template, styles = { spaces: '\t' }) {
     })
 }
 
-export default exec
+module.exports = exec
