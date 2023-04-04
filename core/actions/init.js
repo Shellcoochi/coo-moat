@@ -22,7 +22,7 @@ const IGNORE_TEMPLATE = `
 !.vscode/extensions.json
     `
 
-function exec() {
+function init() {
     try {
         // eslint初始化
         installPkg('eslint', initEslintConfig, ['-D'])
@@ -30,7 +30,8 @@ function exec() {
         installPkg('@commitlint/{config-conventional,cli}', initCommitintConfig, ['-D'])
         //初始化husky
         installPkg('husky', initHuskyConfig, ['-D',])
-        return false
+        //初始化lint-staged
+        installPkg('lint-staged', initLintstagedConfig, ['-D',])
         // 更新[.vscode]中的配置文件
         updateVscodeConfig()
         // 更新[.gitionore]
@@ -40,6 +41,12 @@ function exec() {
     }
 }
 
+/**
+ * 安装依赖包
+ * @param {*} pkgName 包名
+ * @param {*} callBack 安装成功后的回调函数
+ * @param {*} args 命令参数
+ */
 function installPkg(pkgName, callBack, args = []) {
     const installer = spawn(PREFIX, ['install', pkgName, ...args])
     installer.stdout.on('data', function (data) {
@@ -54,6 +61,19 @@ function installPkg(pkgName, callBack, args = []) {
         } else {
             log.success(`${pkgName} 安装成功`)
             callBack?.()
+        }
+    })
+}
+
+/**
+ * 初始化pkg.json中的husky配置
+ */
+function initLintstagedConfig() {
+    rewriteJson('package.json', {
+        "lint-staged": {
+            "*.{js,vue}": [
+                "eslint --fix"
+            ]
         }
     })
 }
@@ -115,11 +135,13 @@ function updateVscodeConfig() {
     rewriteJson(extensionsFilePath, EXTENSIONS_TEMPLATE)
     // 修改[.vscode] settings.json
     rewriteJson(settingsFilePath, SETTINGS_TEMPLATE)
-    //修改ignore文件
 }
 
 /**
- * 重写json文件
+ * 重写json文件（若文件存在且不为空，则追加写入；若文件不存在则创建并写入）
+ * @param {*} path 文件路径
+ * @param {*} template 写入的内容
+ * @param {*} styles 文件内容格式美化
  */
 function rewriteJson(path, template, styles = { spaces: '\t' }) {
     // 确保目标JSON文件存在，若不存在则创建
@@ -142,4 +164,4 @@ function rewriteJson(path, template, styles = { spaces: '\t' }) {
     })
 }
 
-module.exports = exec
+module.exports = init
