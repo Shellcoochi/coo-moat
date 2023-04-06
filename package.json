@@ -1,10 +1,10 @@
 {
   "name": "coo-moat",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "bin": {
-    "coo": "dist/coo-moat.js"
+    "coo": "dist/core/coo-moat.js"
   },
   "files": [
     "dist/*"
