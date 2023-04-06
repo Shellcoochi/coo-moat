@@ -113,7 +113,7 @@ function initCommitintConfig() {
  * 初始化eslint配置文件
  */
 function initEslintConfig() {
-    spawn(PREFIX, ['eslint', '--init'], {
+    spawn('npx', ['eslint', '--init'], {
         stdio: 'inherit'
     })
 }
