@@ -20,9 +20,9 @@ function main() {
 
 function registerCommand() {
   program
-    .name(Object.keys(pkg.bin)[0])
+    .name('coo-moat')
     .usage('<command> [options]')
-    .version(pkg.version)
+    // .version(pkg.version)
 
   program
     .command('init [projectName]')

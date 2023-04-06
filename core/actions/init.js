@@ -27,11 +27,11 @@ function init() {
         // eslint初始化
         installPkg('eslint', initEslintConfig, ['-D'])
         // 初始化commitlint
-        installPkg('@commitlint/{config-conventional,cli}', initCommitintConfig, ['-D'])
+        installPkg('@commitlint/config-conventional', initCommitintConfig, ['@commitlint/cli', '-D'])
         //初始化husky
-        installPkg('husky', initHuskyConfig, ['-D',])
+        installPkg('husky', initHuskyConfig, ['-D'])
         //初始化lint-staged
-        installPkg('lint-staged', initLintstagedConfig, ['-D',])
+        installPkg('lint-staged', initLintstagedConfig, ['-D'])
         // 更新[.vscode]中的配置文件
         updateVscodeConfig()
         // 更新[.gitionore]
@@ -83,22 +83,28 @@ function initLintstagedConfig() {
  */
 function initHuskyConfig() {
     // 生成.husky目录命令
-    const dirCmd = 'husky install'
+    const dirCmd = ['husky', 'install'];
     // 添加pre-commit钩子命令
-    const preCommitCmd = "add .husky/pre-commit 'npx run lint-staged'"
+    const preCommitCmd = ['husky', 'add', '.husky/pre-commit', 'npx run lint-staged']
     //添加commit-msg钩子命令
-    const commitMsgCmd = "add .husky/commit-msg 'npx --no-install commitlint --edit $1'"
-    spawn('npx', [dirCmd, preCommitCmd, commitMsgCmd], {
-        stdio: 'inherit'
-    })
+    const commitMsgCmd = ['husky', 'add', '.husky/commit-msg', 'npx --no-install commitlint --edit $1'];
+    spawn("npx", dirCmd, {
+        stdio: "inherit"
+    });
+    spawn("npx", preCommitCmd, {
+        stdio: "inherit"
+    });
+    spawn("npx", commitMsgCmd, {
+        stdio: "inherit"
+    });
 }
 
 /**
  * 初始化commitlint配置文件
  */
 function initCommitintConfig() {
-    spawn('echo',
-        ["module.exports = {extends: ['@commitlint/config-conventional']}", '>', 'commitlint.config.js'], {
+    spawn('echo module.exports = {extends: ["@commitlint/config-conventional"]}',
+        ['>', 'commitlint.config.js'], {
         stdio: 'inherit'
     })
 }
