@@ -1,5 +1,5 @@
 const fs = require('fs-extra')
-const { exec: spawn, execAsync } = require('../../tools/utils')
+const { exec: spawn, execAsync, spinnerStart } = require('../../tools/utils')
 const log = require('../../tools/log')
 
 const EXTENSIONS_TEMPLATE =
@@ -19,23 +19,35 @@ const IGNORE_TEMPLATE = `
 !.vscode/settings.json
 !.vscode/extensions.json
     `
+const DEPENDENCIES = [
+    'eslint@~8.37.0',
+    '@commitlint/config-conventional@~17.4.4',
+    '@commitlint/cli@~17.5.1',
+    'husky@~8.0.3',
+    'lint-staged@~13.2.0'
+]
 
 function init() {
-    console.log('sdf')
-    return false
     try {
-        // eslint初始化
-        installPkg('eslint', initEslintConfig, ['-D'])
-        // 初始化commitlint
-        installPkg('@commitlint/config-conventional', initCommitintConfig, ['@commitlint/cli', '-D'])
-        //初始化husky
-        installPkg('husky', initHuskyConfig, ['-D'])
-        //初始化lint-staged
-        installPkg('lint-staged', initLintstagedConfig, ['-D'])
-        // 更新[.vscode]中的配置文件
-        updateVscodeConfig()
-        // 更新[.gitionore]
-        updateIgnoreFile()
+        const spinner =spinnerStart('正在安装依赖')
+        // 安装依赖
+        installPkg(DEPENDENCIES, () => {
+            spinner.stop()
+            log.success('依赖安装成功！')
+            // 初始化eslint配置文件
+            initEslintConfig()
+            // 初始化commitlint配置文件
+            initCommitintConfig()
+            // 初始化husky配置文件
+            initHuskyConfig()
+            // 初始化pkg.json中的husky配置
+            initLintstagedConfig()
+            // 更新[.vscode]中的配置文件
+            updateVscodeConfig()
+            // 更新[.gitionore]
+            updateIgnoreFile()
+        }, ['-D'])
+
     } catch (e) {
         log.error(e)
     }
@@ -47,9 +59,9 @@ function init() {
  * @param {*} callBack 安装成功后的回调函数
  * @param {*} args 命令参数
  */
-function installPkg(pkgName, callBack, args = []) {
+function installPkg(pkgNames, callBack, args = []) {
     const PREFIX = process.env.CLI_PACKAGE_MANAGER ?? 'npm'
-    const installer = spawn(PREFIX, ['install', pkgName, ...args])
+    const installer = spawn(PREFIX, ['install', ...pkgNames, ...args])
     installer.stdout.on('data', function (data) {
         log.info(data)
     })
@@ -58,9 +70,8 @@ function installPkg(pkgName, callBack, args = []) {
     })
     installer.on('close', function (code) {
         if (code !== 0) {
-            throw (`${pkgName} 安装出错: ${code}`)
+            throw (code)
         } else {
-            log.success(`${pkgName} 安装成功`)
             callBack?.()
         }
     })
@@ -82,20 +93,20 @@ function initLintstagedConfig() {
 /**
  * 初始化husky配置文件
  */
-function initHuskyConfig() {
+async function initHuskyConfig() {
     // 生成.husky目录命令
     const dirCmd = ['husky', 'install'];
     // 添加pre-commit钩子命令
-    const preCommitCmd = ['husky', 'add', '.husky/pre-commit', 'npx run lint-staged']
+    const preCommitCmd = ['husky', 'add', '.husky/pre-commit', 'npx lint-staged']
     //添加commit-msg钩子命令
     const commitMsgCmd = ['husky', 'add', '.husky/commit-msg', 'npx --no-install commitlint --edit $1'];
-    spawn("npx", dirCmd, {
+    await execAsync("npx", dirCmd, {
         stdio: "inherit"
     });
-    spawn("npx", preCommitCmd, {
+    await execAsync("npx", preCommitCmd, {
         stdio: "inherit"
     });
-    spawn("npx", commitMsgCmd, {
+    await execAsync("npx", commitMsgCmd, {
         stdio: "inherit"
     });
 }
@@ -104,7 +115,7 @@ function initHuskyConfig() {
  * 初始化commitlint配置文件
  */
 function initCommitintConfig() {
-    spawn('echo module.exports = {extends: ["@commitlint/config-conventional"]}',
+    spawn("echo module.exports = { extends: ['@commitlint/config-conventional'] }",
         ['>', 'commitlint.config.js'], {
         stdio: 'inherit'
     })

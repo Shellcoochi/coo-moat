@@ -5,7 +5,7 @@ const { init } = require('../actions')
 const log = require('../../tools/log')
 const { getNpmInfo, getNpmSemverVersion } = require('../../tools/utils')
 
-const pkg = require("../package.json");
+const pkg = require("../../package.json");
 
 const program = new Command()
 
