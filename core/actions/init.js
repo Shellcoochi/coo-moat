@@ -2,8 +2,6 @@ const fs = require('fs-extra')
 const { exec: spawn, execAsync } = require('../../tools/utils')
 const log = require('../../tools/log')
 
-const PREFIX = 'pnpm'
-
 const EXTENSIONS_TEMPLATE =
 {
     "recommendations": [
@@ -23,6 +21,8 @@ const IGNORE_TEMPLATE = `
     `
 
 function init() {
+    console.log('sdf')
+    return false
     try {
         // eslint初始化
         installPkg('eslint', initEslintConfig, ['-D'])
@@ -48,6 +48,7 @@ function init() {
  * @param {*} args 命令参数
  */
 function installPkg(pkgName, callBack, args = []) {
+    const PREFIX = process.env.CLI_PACKAGE_MANAGER ?? 'npm'
     const installer = spawn(PREFIX, ['install', pkgName, ...args])
     installer.stdout.on('data', function (data) {
         log.info(data)

@@ -1,5 +1,29 @@
 const childProcess = require('child_process')
 const cliSpinner = require('cli-spinner')
+const axios = require('axios');
+const urlJoin = require('url-join');
+const semver = require('semver');
+
+function getNpmInfo(npmName) {
+  if (!npmName) {
+    return null;
+  }
+  const registryUrl = 'https://registry.npmJs.org';
+  const npmUrl = urlJoin(registryUrl, npmName);
+  return axios.get(npmUrl).then(response => {
+    if (response.status === 200) {
+      return response.data;
+    }
+    return null;
+  }).catch(err => Promise.reject(err))
+}
+
+function getNpmSemverVersions(baseVersion, versions) {
+  return versions
+    .filter(version => semver.satisfies(version, `^${baseVersion}`))
+    .sort((a, b) => semver.gt(b, a) ? 1 : -1);
+}
+
 
 function exec(command, args, options) {
   const win32 = process.platform === 'win32'
@@ -38,4 +62,4 @@ function sleep(timeout = 1000) {
   return new Promise(resolve => setTimeout(resolve, timeout))
 }
 
-module.exports = { isObject, spinnerStart, sleep, exec, execAsync }
+module.exports = { isObject, spinnerStart, sleep, exec, execAsync, getNpmInfo, getNpmSemverVersions }
