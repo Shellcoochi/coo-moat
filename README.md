@@ -5,8 +5,8 @@
 
 工具会自动初始化，eslint配置、husky配置、commitlint配置、lint-stage配置。
 注：
-	- 初始化后的配置仅包含基础配置，如需扩展可自行添加配置即可
-	- 初始化时若部分配置文件已存在，则会追加配置
+- 初始化后的配置仅包含基础配置，如需扩展可自行添加配置即可
+- 初始化时若部分配置文件已存在，则会追加配置
 ## 用法
 
 *安装*
@@ -15,5 +15,5 @@ npm install coo-moat --global
 ```
 *在前端项目根目录下执行*
 ```javascript
-npm run coo init
+coo init
 ```
