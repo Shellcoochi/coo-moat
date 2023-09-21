@@ -1,8 +1,8 @@
 const fs = require("fs-extra");
 const inquirer = require("inquirer");
-const { exec: spawn, execAsync, spinnerStart } = require("../../tools/utils");
+const { exec: spawn, spinnerStart } = require("../../tools/utils");
 const log = require("../../tools/log");
-const { PACKAGEMANAGER } = require("../consts");
+const { PACKAGEMANAGER, ENV } = require("../consts");
 
 const EXTENSIONS_TEMPLATE = {
   recommendations: ["dbaeumer.vscode-eslint"],
@@ -29,7 +29,7 @@ const DEPENDENCIES = [
 async function init() {
   try {
     const prompts = [];
-    if (!PACKAGEMANAGER.CHOICES.includes(process.env[PACKAGEMANAGER.NAME])) {
+    if (!PACKAGEMANAGER.CHOICES.includes(process.env[ENV.PACKAGEMANAGER])) {
       prompts.push({
         type: "list",
         name: PACKAGEMANAGER.NAME,
@@ -74,7 +74,7 @@ async function init() {
  * @param {*} args 命令参数
  */
 function installPkg(pkgNames, callBack, args = []) {
-  const PREFIX = process.env[PACKAGEMANAGER.NAME] ?? PACKAGEMANAGER.DEFAULT;
+  const PREFIX = process.env[ENV.PACKAGEMANAGER] ?? PACKAGEMANAGER.DEFAULT;
   const installer = spawn(PREFIX, ["install", ...pkgNames, ...args]);
   installer.stdout.on("data", function (data) {
     log.info(data);

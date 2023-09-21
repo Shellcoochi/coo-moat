@@ -1,7 +1,14 @@
-const PACKAGEMANAGER = {
-    NAME:'packagemanager',
-    CHOICES:['npm','pnpm','yarn'],
-    DEFAULT:'npm'
+const ENV = {
+  /** 包管理工具 */
+  PACKAGEMANAGER: "packagemanager",
+  /** 是否是GIT仓库目录 */
+  ISGITREPOSITORY: "isGitRepository",
 };
 
-module.exports = { PACKAGEMANAGER };
+const PACKAGEMANAGER = {
+  NAME: ENV.PACKAGEMANAGER,
+  CHOICES: ["npm", "pnpm", "yarn"],
+  DEFAULT: "npm",
+};
+
+module.exports = { ENV, PACKAGEMANAGER };
