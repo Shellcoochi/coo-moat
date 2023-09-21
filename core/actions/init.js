@@ -1,6 +1,8 @@
 const fs = require("fs-extra");
+const inquirer = require("inquirer");
 const { exec: spawn, execAsync, spinnerStart } = require("../../tools/utils");
 const log = require("../../tools/log");
+const { PACKAGEMANAGER } = require("../consts");
 
 const EXTENSIONS_TEMPLATE = {
   recommendations: ["dbaeumer.vscode-eslint"],
@@ -24,8 +26,20 @@ const DEPENDENCIES = [
   "lint-staged@~13.2.0",
 ];
 
-function init() {
+async function init() {
   try {
+    const prompts = [];
+    if (!PACKAGEMANAGER.CHOICES.includes(process.env[PACKAGEMANAGER.NAME])) {
+      prompts.push({
+        type: "list",
+        name: PACKAGEMANAGER.NAME,
+        message: `请选择您的包管理工具`,
+        choices: PACKAGEMANAGER.CHOICES,
+        default: PACKAGEMANAGER.DEFAULT,
+      });
+    }
+    const inquirerData = await inquirer.prompt(prompts);
+    process.env = { ...process.env, ...inquirerData };
     const spinner = spinnerStart("正在安装依赖");
     // 安装依赖
     installPkg(
@@ -60,7 +74,7 @@ function init() {
  * @param {*} args 命令参数
  */
 function installPkg(pkgNames, callBack, args = []) {
-  const PREFIX = process.env.CLI_PACKAGE_MANAGER ?? "npm";
+  const PREFIX = process.env[PACKAGEMANAGER.NAME] ?? PACKAGEMANAGER.DEFAULT;
   const installer = spawn(PREFIX, ["install", ...pkgNames, ...args]);
   installer.stdout.on("data", function (data) {
     log.info(data);
