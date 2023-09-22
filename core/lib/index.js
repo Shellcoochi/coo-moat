@@ -2,9 +2,10 @@ const { Command } = require("commander");
 const fs = require("fs-extra");
 const semver = require("semver");
 const { init } = require("../actions");
-const { PACKAGEMANAGER, ENV } = require("../consts");
+const { PACKAGEMANAGER, ENV, DEPENDENCIES } = require("../consts");
 const log = require("../../tools/log");
 const inquirer = require("inquirer");
+const lodash = require("lodash");
 const {
   execAsync,
   getNpmInfo,
@@ -56,6 +57,7 @@ function registerCommand() {
 async function prepare() {
   await checkPkgVersion();
   await checkGitRepository();
+  await checkLintTools();
 }
 
 function checkRoot() {
@@ -104,6 +106,21 @@ async function checkPkgVersion() {
       `建议手动更新 ${npmName}，当前版本 ${currentVersion}，最新版本 ${lastVersion}`
     );
   }
+}
+
+/**
+ * 检查当前项目是否已经存在lint相关工具
+ */
+async function checkLintTools() {
+  const { dependencies, devDependencies } = pkg;
+  const allDependency = { ...dependencies, ...devDependencies };
+  const excludeDep = [];
+  lodash.forIn(allDependency, (version, dependency) => {
+    if (DEPENDENCIES.includes(dependency)) {
+      excludeDep.push(dependency);
+    }
+  });
+  process.env[ENV.EXCLUDEDEPENDENCIES] = excludeDep;
 }
 
 /**

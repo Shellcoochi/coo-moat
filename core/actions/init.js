@@ -2,7 +2,7 @@ const fs = require("fs-extra");
 const inquirer = require("inquirer");
 const { exec: spawn, spinnerStart } = require("../../tools/utils");
 const log = require("../../tools/log");
-const { PACKAGEMANAGER, ENV } = require("../consts");
+const { PACKAGEMANAGER, ENV,DEPENDENCIES } = require("../consts");
 
 const EXTENSIONS_TEMPLATE = {
   recommendations: ["dbaeumer.vscode-eslint"],
@@ -18,13 +18,6 @@ const IGNORE_TEMPLATE = `
 !.vscode/settings.json
 !.vscode/extensions.json
     `;
-const DEPENDENCIES = [
-  "eslint@~8.37.0",
-  "@commitlint/config-conventional@~17.4.4",
-  "@commitlint/cli@~17.5.1",
-  "husky@~8.0.3",
-  "lint-staged@~13.2.0",
-];
 
 async function init() {
   try {
@@ -75,7 +68,8 @@ async function init() {
  */
 function installPkg(pkgNames, callBack, args = []) {
   const PREFIX = process.env[ENV.PACKAGEMANAGER] ?? PACKAGEMANAGER.DEFAULT;
-  const installer = spawn(PREFIX, ["install", ...pkgNames, ...args]);
+  const installPkgs = pkgNames.filter(item => !process.env[ENV.PACKEXCLUDEDEPENDENCIESAGEMANAGER].includes(item));
+  const installer = spawn(PREFIX, ["install", ...installPkgs, ...args]);
   installer.stdout.on("data", function (data) {
     log.info(data);
   });

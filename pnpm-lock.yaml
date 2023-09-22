@@ -26,6 +26,9 @@ dependencies:
   inquirer:
     specifier: ^8.0.0
     version: registry.npmmirror.com/inquirer@8.2.6
+  lodash:
+    specifier: ^4.17.21
+    version: registry.npmmirror.com/lodash@4.17.21
   npmlog:
     specifier: ^7.0.1
     version: registry.npmmirror.com/npmlog@7.0.1
