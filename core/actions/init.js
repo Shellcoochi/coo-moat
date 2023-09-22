@@ -2,22 +2,12 @@ const fs = require("fs-extra");
 const inquirer = require("inquirer");
 const { exec: spawn, spinnerStart } = require("../../tools/utils");
 const log = require("../../tools/log");
-const { PACKAGEMANAGER, ENV,DEPENDENCIES } = require("../consts");
-
-const EXTENSIONS_TEMPLATE = {
-  recommendations: ["dbaeumer.vscode-eslint"],
-};
-const SETTINGS_TEMPLATE = {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-  },
-};
-
-const IGNORE_TEMPLATE = `
-# coo-moat
-!.vscode/settings.json
-!.vscode/extensions.json
-    `;
+const { PACKAGEMANAGER, ENV, DEPENDENCIES } = require("../consts");
+const {
+  EXTENSIONS_TEMPLATE,
+  SETTINGS_TEMPLATE,
+  IGNORE_TEMPLATE,
+} = require("../template");
 
 async function init() {
   try {
@@ -68,7 +58,9 @@ async function init() {
  */
 function installPkg(pkgNames, callBack, args = []) {
   const PREFIX = process.env[ENV.PACKAGEMANAGER] ?? PACKAGEMANAGER.DEFAULT;
-  const installPkgs = pkgNames.filter(item => !process.env[ENV.PACKEXCLUDEDEPENDENCIESAGEMANAGER].includes(item));
+  const installPkgs = pkgNames.filter(
+    (item) => !process.env[ENV.PACKEXCLUDEDEPENDENCIESAGEMANAGER].includes(item)
+  );
   const installer = spawn(PREFIX, ["install", ...installPkgs, ...args]);
   installer.stdout.on("data", function (data) {
     log.info(data);
