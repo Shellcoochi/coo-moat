@@ -15,6 +15,8 @@ const DEPENDENCIES = [
   "@commitlint/config-conventional",
   "@commitlint/cli",
   "lint-staged",
+  "stylelint",
+  "stylelint-config-standard",
 ];
 
 /** 包管理工具 */

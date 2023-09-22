@@ -4,9 +4,13 @@ const { exec: spawn, spinnerStart } = require("../../tools/utils");
 const log = require("../../tools/log");
 const { PACKAGEMANAGER, ENV, DEPENDENCIES } = require("../consts");
 const {
-  EXTENSIONS_TEMPLATE,
   SETTINGS_TEMPLATE,
+  EXTENSIONS_TEMPLATE,
   IGNORE_TEMPLATE,
+  ESLINTIGNORE_TEMPLATE,
+  STYLELINTRC_TEMPLATE,
+  STYLELINTIGNORE_TEMPLATE,
+  COMMITLINTCONFIG_TEMPLATE,
 } = require("../template");
 
 async function init() {
@@ -32,6 +36,8 @@ async function init() {
         log.success("依赖安装成功！");
         // 初始化eslint配置文件
         initEslintConfig();
+        // 初始化stylelint配置文件
+        initStylelintConfig();
         // 初始化commitlint配置文件
         initCommitintConfig();
         // 初始化pkg.json中的husky初始化命令
@@ -118,22 +124,43 @@ function initHuskyConfig() {
  * 初始化commitlint配置文件
  */
 function initCommitintConfig() {
-  spawn(
-    "echo module.exports = { extends: ['@commitlint/config-conventional'] }",
-    [">", "commitlint.config.js"],
-    {
-      stdio: "inherit",
-    }
-  );
+  const jsFilename = "commitlint.config.js";
+  const jsonFilename = "commitlint.config.json";
+  if (!fs.existsSync(jsFilename) && !fs.existsSync(jsonFilename)) {
+    fs.writeFileSync(jsFilename, COMMITLINTCONFIG_TEMPLATE);
+  }
 }
 
 /**
  * 初始化eslint配置文件
  */
 function initEslintConfig() {
-  spawn("npx", ["eslint", "--init"], {
-    stdio: "inherit",
-  });
+  const jsEslintFile = ".eslintrc.js";
+  const jsonEslintFile = ".eslintrc.json";
+  const eslintIgnoreFile = ".eslintignore";
+  if (!fs.existsSync(jsEslintFile) && !fs.existsSync(jsonEslintFile)) {
+    spawn("npx", ["eslint", "--init"], {
+      stdio: "inherit",
+    });
+  }
+  if (!fs.existsSync(eslintIgnoreFile)) {
+    fs.writeFileSync(eslintIgnoreFile, ESLINTIGNORE_TEMPLATE);
+  }
+}
+
+/**
+ * 初始化stylelint配置文件
+ */
+function initStylelintConfig(){
+  const jsStylelintFile = ".stylelintrc.js";
+  const jsonStylelintFile = ".stylelintrc.json";
+  const StylelintIgnoreFile = ".stylelintignore";
+  if (!fs.existsSync(jsStylelintFile) && !fs.existsSync(jsonStylelintFile)) {
+    fs.writeFileSync(jsStylelintFile, STYLELINTRC_TEMPLATE);
+  }
+  if (!fs.existsSync(StylelintIgnoreFile)) {
+    fs.writeFileSync(StylelintIgnoreFile, STYLELINTIGNORE_TEMPLATE);
+  }
 }
 
 /**
